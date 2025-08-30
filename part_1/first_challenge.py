@@ -19,13 +19,13 @@ print(f"Pattern: {test_pattern}")
 print(f"Result: {result}")
 print("-" * 30)
 
-# Step 2: Now let's try to read your file
-print("Step 2: Reading your file")
+# Step 2: Actual file 
+print("Step 2")
 try:
     with open('data/first_sample.txt', 'r') as file:
         content = file.read()
         print("File content:")
-        print(repr(content))  # This shows exactly what's in the file
+        print(repr(content))  
         print("-" * 30)
         
         lines = content.strip().split('\n')
@@ -49,7 +49,7 @@ try:
             print("Error: Need at least 2 lines in the file")
             
 except FileNotFoundError:
-    print("File 'test_tarik.txt' not found in current directory")
+    print("File not found in current directory")
     print("Make sure the file is in the same folder as this Python script")
     
 except Exception as e:

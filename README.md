@@ -73,3 +73,28 @@ FrequencyTable(Text, k)
         if freqMap[pattern] = max
             append Pattern to frequentPatterns
     return frequentPatterns
+
+    However, before concluding that we have found the DnaA box of Vibrio cholerae, the careful bioinformatician should check if there are other short regions in the Vibrio cholerae genome exhibiting multiple occurrences of ATGATCAAG (or CTTGATCAT). After all, maybe these strings occur as repeats throughout the entire Vibrio cholerae genome, rather than just in the ori region. To this end, we need to solve the following problem.
+
+Pattern Matching Problem: Find all occurrences of a pattern in a string.
+
+Input: Strings Pattern and Genome.
+Output: All starting positions in Genome where Pattern appears as a substring.
+
+-----------------------------------------------------------------------
+Looking for hidden messages in multiple genomes
+We should not jump to the conclusion that ATGATCAAG/CTTGATCAT is a hidden message for all bacterial genomes without first checking whether it even appears in known ori regions from other bacteria. After all, maybe the clumping effect of ATGATCAAG/CTTGATCAT in the ori region of Vibrio cholerae is simply a statistical fluke that has nothing to do with replication. Or maybe different bacteria have different DnaA boxes…
+
+Before we lose all hope, let’s change our computational focus: instead of finding clumps of a specific k-mer, let’s try to find every k-mer that forms a clump in the genome. Hopefully, the locations of these clumps will shed light on the location of ori.
+
+Our plan is to slide a window of fixed length L along the genome, looking for a region where a k-mer appears several times in short succession. The parameter value L = 500 reflects the typical length of ori in bacterial genomes.
+
+We defined a k-mer as a "clump" if it appears many times within a short interval of the genome. More formally, given integers L and t, a k-mer Pattern forms an (L, t)-clump inside a (longer) string Genome if there is an interval of Genome of length L in which this k-mer appears at least t times. (This definition assumes that the k-mer completely fits within the interval. This also does not take reverse complements into account yet.) For example, TGCA forms a (25,3)-clump in the following Genome:
+
+gatcagcataagggtccCTGCAATGCATGACAAGCCTGCAGTtgttttac
+
+From our previous examples of ori regions, ATGATCAAG forms a (500,3)-clump in the Vibrio cholerae genome, and CCTACCACC forms a (500,3)-clump in the Thermotoga petrophila genome. We are now ready to formulate the following problem.
+
+Clump Finding Problem: Find patterns forming clumps in a string.
+     Input: A string Genome, and integers k, L, and t.
+     Output: All distinct k-mers forming (L, t)-clumps in Genome.
