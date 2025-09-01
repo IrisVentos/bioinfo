@@ -76,9 +76,9 @@ def solve_from_file(filename):
                 print(f"Starting positions: {result_str}")
                 
                 # Save result to output file
-                with open('output_bonus.txt', 'w') as output:
+                with open('output_bonus_v2.txt', 'w') as output:
                     output.write(result_str)
-                print("Result saved to output_bonus.txt")
+                print("Result saved to output_bonus_v2.txt")
                 
                 return result_str
             else:
@@ -132,4 +132,4 @@ if __name__ == "__main__":
     
     # Solve from your file
     print("="*50)
-    solve_from_file('data/bonus_sample.txt')  
+    solve_from_file('data/part_1_data/bonus_sample.txt')  

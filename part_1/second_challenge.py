@@ -75,9 +75,9 @@ def solve_from_file(filename):
                 print(f"Most frequent {k}-mers: {result_str}")
                 
                 # Save result to output file
-                with open('output.txt', 'w') as output:
+                with open('part_1/output_v2.txt', 'w') as output:
                     output.write(result_str)
-                print("Result saved to output.txt")
+                print("Result saved to output_v2.txt")
                 
                 return result_str
             else:
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     
     # Try to solve from file (adjust filename as needed)
     print("\n" + "="*50)
-    solve_from_file('data/second_sample.txt')  # Change this to your file path
+    solve_from_file('data/part_1_data/second_sample.txt')  # Change this to your file path
     
     # Uncomment for interactive mode
-    # solve_interactive()
+    #solve_interactive()
