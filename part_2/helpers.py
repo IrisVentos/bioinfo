@@ -83,3 +83,52 @@ def format_minimum_skew_result(genome):
     """
     result = solve_minimum_skew_problem(genome)
     return ' '.join(map(str, result['min_positions']))
+
+def hamming_distance(p, q):
+    """
+    Compute the Hamming distance between two strings of equal length.
+    
+    The Hamming distance is the number of positions where the characters differ.
+    
+    Args:
+        p (str): First string
+        q (str): Second string
+        
+    Returns:
+        int: The Hamming distance between p and q
+    """
+    if len(p) != len(q):
+        raise ValueError("Strings must be of equal length")
+    
+    distance = 0
+    for i in range(len(p)):
+        if p[i] != q[i]:
+            distance += 1
+    
+    return distance
+
+def approximate_pattern_matching(pattern, text, d):
+    """
+    Find all approximate occurrences of a pattern in a string.
+    
+    Args:
+        pattern (str): The pattern to search for
+        text (str): The text to search in
+        d (int): Maximum number of mismatches allowed
+        
+    Returns:
+        list: All starting positions where pattern appears with at most d mismatches
+    """
+    positions = []
+    pattern_length = len(pattern)
+    
+    # Check every possible position in the text
+    for i in range(len(text) - pattern_length + 1):
+        # Extract k-mer from text starting at position i
+        substring = text[i:i + pattern_length]
+        
+        # Check if Hamming distance is at most d
+        if hamming_distance(pattern, substring) <= d:
+            positions.append(i)
+    
+    return positions
