@@ -1,39 +1,7 @@
 # The goal is to find all k-mers with up to d mismatches with Pattern in Text 
 
-from helpers import hamming_distance
+from helpers import hamming_distance,neighbors
 from itertools import product
-
-def neighbors(pattern, d):
-    """
-    Generate all k-mers within Hamming distance d from pattern.
-    This is the d-neighborhood of pattern.
-    
-    Args:
-        pattern (str): The original k-mer pattern
-        d (int): Maximum Hamming distance allowed
-        
-    Returns:
-        set: All k-mers within distance d from pattern
-    """
-    if d == 0:
-        return {pattern}
-    
-    if len(pattern) == 1:
-        return {'A', 'C', 'G', 'T'}
-    
-    neighborhood = set()
-    suffix_neighbors = neighbors(pattern[1:], d)
-    
-    for suffix in suffix_neighbors:
-        if hamming_distance(pattern[1:], suffix) < d:
-            # If suffix uses < d mismatches, first nucleotide can be anything
-            for nucleotide in ['A', 'C', 'G', 'T']:
-                neighborhood.add(nucleotide + suffix)
-        else:
-            # If suffix uses exactly d mismatches, first nucleotide must match
-            neighborhood.add(pattern[0] + suffix)
-    
-    return neighborhood
 
 def frequent_words_with_mismatches(text, k, d):
     """

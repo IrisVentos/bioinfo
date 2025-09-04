@@ -87,7 +87,7 @@ def frequent_words_with_mismatches_and_reverse_complements(text, k, d):
     return frequent_patterns
 
 # Read input from file
-with open('data/part_2_data/sample_7.txt', 'r') as f:
+with open('data/part_2_data/sample_8.txt', 'r') as f:
     lines = f.read().strip().split('\n')
     text = lines[0]
     k, d = map(int, lines[1].split())

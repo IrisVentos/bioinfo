@@ -132,3 +132,40 @@ def approximate_pattern_matching(pattern, text, d):
             positions.append(i)
     
     return positions
+
+def neighbors(pattern, d):
+    """
+    Find the d-neighborhood of a string.
+    
+    The d-neighborhood of a pattern consists of all strings that have
+    Hamming distance at most d from the pattern.
+    
+    Args:
+        pattern (str): The input DNA string
+        d (int): Maximum Hamming distance allowed
+        
+    Returns:
+        set: All strings within Hamming distance d from pattern
+    """
+    if d == 0:
+        return {pattern}
+    
+    if len(pattern) == 1:
+        return {'A', 'C', 'G', 'T'}
+    
+    neighborhood = set()
+    
+    # Get neighbors of the suffix (all but first character)
+    suffix_neighbors = neighbors(pattern[1:], d)
+    
+    for text in suffix_neighbors:
+        # Reuse hamming_distance function from helpers
+        if hamming_distance(pattern[1:], text) < d:
+            # If suffix uses < d mismatches, first character can be anything
+            for nucleotide in ['A', 'C', 'G', 'T']:
+                neighborhood.add(nucleotide + text)
+        else:
+            # If suffix uses exactly d mismatches, first character must match
+            neighborhood.add(pattern[0] + text)
+    
+    return neighborhood

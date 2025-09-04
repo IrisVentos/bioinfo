@@ -16,15 +16,6 @@ PatternCount(Text, Pattern)
   return count
 Some notes on how code challenges work:
 
-You should write your code implementing PatternCount first; you can choose any programming language you like.
-When you click "Download Dataset", you will receive a randomized dataset. In this problem, the dataset will contain two lines: the first line contains Text, and the second line contains Pattern. In general, the "Sample Input" section shows how 
-Run your program (in the programming language of your choice) on the dataset, and then return the output of your program in the text field below. (Please do not enter your code in the browser.)
-There is a time limit on each problem to ensure that your code is sufficiently efficient to return the correct output quickly.
-You can see how you should format your answer by looking at the sample output.
-You have unlimited attempts to answer the question, but each time you click "Try Again", you will need to download a new dataset.
-We also provide additional small datasets (see link below) to help you debug your code.
-
-
 ------------------------------------------------------------------------
 A straightforward algorithm for finding the most frequent k-mers in a string Text checks all k-mers appearing in this string (there are |Text| − k + 1 such k-mers) and then computes how many times each k-mer appears in Text. To implement this algorithm, called FrequentWords, we will need to generate an array Count, where Count(i) stores Count(Text, Pattern) for Pattern = Text(i, k) (see figure below).
 
@@ -48,11 +39,6 @@ FrequentWords(Text, k)
 
     Although FrequentWords finds most frequent k-mers, it is not very efficient. Each call to PatternCount(Text, Pattern) checks whether the k-mer Pattern appears in position 0 of Text, position 1 of Text, and so on. Since each k-mer requires |Text| − k + 1 such checks, each one requiring as many as k comparisons, the overall number of steps of PatternCount(Text, Pattern) is (|Text| − k + 1) · k. Furthermore, FrequentWords must call PatternCount |Text| − k + 1 times (once for each k-mer of Text), so that its overall number of steps is (|Text| − k + 1) · (|Text| − k + 1) · k. To simplify the matter, computer scientists often say that the runtime of FrequentWords has an upper bound of |Text|^2 · k steps and refer to the complexity of this algorithm as O(|Text|2 · k). For more details, see "DETOUR: Big-O Notation" in the print companion.
 
-If |Text| and k are small, as is the case when looking for DnaA boxes in the typical bacterial ori, then an algorithm with running time of O(|Text|2 · k) is perfectly acceptable. But once we find some new biological application requiring us to solve the Frequent Words Problem for a very long Text, we will quickly run into trouble. What can we do instead?
-
-We know that an array of length n is an ordered table of values, where we access the values using the integer indices 0 through n-1. The frequency table is a generalized version of an array called a map or dictionary for which the indices are allowed to be arbitrary values (in this case, they are strings). More precisely, the indices of a map are called keys.
-
-Given a map dict, we can access the value associated with a key key using the notation dict[key]. In the case of a frequency table called freq, we can access the value associated with some key string pattern using the notation freq[pattern]. The following pseudocode function takes a string text and an integer k as input and returns their frequency table as a map of string keys to integer values.
 
 FrequencyTable(Text, k)
     freqMap ← empty map
@@ -98,3 +84,18 @@ From our previous examples of ori regions, ATGATCAAG forms a (500,3)-clump in th
 Clump Finding Problem: Find patterns forming clumps in a string.
      Input: A string Genome, and integers k, L, and t.
      Output: All distinct k-mers forming (L, t)-clumps in Genome.
+
+
+----------------------------------------------------------------------
+We do not know what purpose — if any — these other 9-mers serve in the E. coli genome, but we do know that there are many different types of hidden messages in genomes; these hidden messages have a tendency to cluster within a genome, and most of them have nothing to do with replication. One example is the regulatory DNA motifs responsible for gene expression that we will study soon. The important lesson is that existing approaches to ori prediction remain imperfect and are sometimes inconclusive. However, even providing biologists with a small collection of 9-mers as candidate DnaA boxes is a great aid as long as one of these 9-mers is correct.
+
+Thus, the moral of this chapter is that even though computational predictions can be powerful, bioinformaticians should collaborate with biologists to verify their computational predictions. Or improve these predictions: the next question hints at how ori predictions can be carried out using comparative genomics, a bioinformatics approach that uses evolutionary similarities to answer difficult questions about genomes.
+
+We have considered three genomes and found three different hypothesized 9-mers encoding ATGATCAAG in Vibrio cholerae, CCTACCACC in Thermotoga petrophila, and TTATCCACA in E. coli. We must warn you that finding ori is often more complex than in the three examples we considered. Some bacteria have even fewer DnaA boxes than E. coli, making it difficult to identify them. The ter region is often located not directly opposite to ori but may be significantly shifted, resulting in reverse and forward half-strands having substantially different lengths. The position of the skew minimum is often only a rough indicator of ori position, which forces researchers to expand their windows when searching for DnaA boxes, bringing in extraneous repeated substrings. Finally, skew diagrams do not always look as nice as that of E. coli; for example, the skew diagram for Thermotoga petrophila is shown below.
+
+
+Bibliography Notes
+Using the skew to find replication origins was first proposed by Lobry, 1996 and also described in Grigoriev, 1998. Grigoriev, 2011 provides an excellent introduction to the skew approach, and Sernova and Gelfand, 2008 gave a review of algorithms and software tools for finding replication origins in bacteria. Lundgren et al., 2004 demonstrated that archaea may have multiple ori. Wang et al., 2011 inserted an artificial ori into the E. coli genome and showed that it triggers replication. Xia, 2012 was the first to conjecture that bacteria may have multiple replication origins. Gao and Zhang, 2008 developed the Ori-Finder software program for finding bacterial replication origins.
+
+Liachko et al., 2013 provided the most comprehensive description of the replication originsofyeast. Solov’ev, 1966 was the first to derive accurate formulas for approximating the probabilities of patterns in a string. Gardner, 1974 wrote an excellent introductory article about the Best Bet for Simpletons paradox. Guibas and Odlyzko, 1981 provided an excellent coverage of the overlapping words paradox that illustrates the complexity of computing the probabilities of patterns in a random text. They also derived a rather complicated proof of Conway’s formula for Best Bet for Simpletons. Sedgewick and Flajolet, 2013 gave an overview of various approaches for computing the probabilities of patterns in a string.
+"The availability of hundreds of complete bacterial genomes has created new challenges and simultaneously opportunities for bioinformatics. In the area of statistical analysis of genomic sequences, the studies of nucleotide compositional bias and gene bias between strands and replichores paved way to the development of tools for prediction of bacterial replication origins. Only a few (about 20) origin regions for eubacteria and archaea have been proven experimentally. One reason for that may be that this is now considered as an essentially bioinformatics problem, where predictions are sufficiently reliable not to run labor-intensive experiments, unless specifically needed. Here we describe the main existing approaches to the identification of replication origin (oriC) and termination (terC) loci in prokaryotic chromosomes and characterize a number of computational tools based on various skew types and other types of evidence. We also classify the eubacterial and archaeal chromosomes by predictability of their replication origins using skew plots. Finally, we discuss possible combined approaches to the identification of the oriC sites that may be used to improve the prediction tools, in particular, the analysis of DnaA binding sites using the comparative genomic methods."
