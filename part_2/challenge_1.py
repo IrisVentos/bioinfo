@@ -32,7 +32,7 @@ print("Sample Input:", sample_input)
 print("Sample Output:", ' '.join(map(str, sample_skew)))
 
 # Exercise: Calculate skew for GAGCCACCGCGATA
-exercise_input = "GAGCCACCGCGATA"
+exercise_input = "CATTCCAGTACTTCATGATGGCGTGAAGA"
 exercise_skew = calculate_skew(exercise_input)
 print("\nExercise Input:", exercise_input)
 print("Exercise Output:", ' '.join(map(str, exercise_skew)))
