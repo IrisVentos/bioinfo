@@ -24,7 +24,7 @@ def normalize_profile_matrix(profile):
         return profile
     
     k = len(profile[0])  # number of positions
-    normalized_profile = [row[:] for row in profile]  # deep copy
+    normalized_profile = [row[:] for row in profile]  
     
     for col in range(k):
         # Calculate current column sum
