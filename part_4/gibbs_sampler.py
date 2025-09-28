@@ -1,191 +1,147 @@
 import random
 import sys
 
-def GibbsSampler(Dna, k, t, N):
-    """Implements the Gibbs Sampler algorithm."""
-    Motifs = []
-    for dna_string in Dna:
-        start_index = random.randint(0, len(dna_string) - k)
-        Motifs.append(dna_string[start_index:start_index + k])
-    BestMotifs = Motifs
-    for _ in range(N):
-        i = random.randint(0, t - 1)
-        Profile = ProfileWithPseudocounts(Motifs[:i] + Motifs[i+1:])  # Profile without Motifi
-        Motifi = ProfileRandomlyGeneratedKmer(Dna[i], k, Profile)
-        Motifs = Motifs[:i] + [Motifi] + Motifs[i+1:]
-        if Score(Motifs) < Score(BestMotifs):
-            BestMotifs = Motifs
-    return BestMotifs
-
-def ProfileWithPseudocounts(Motifs):
-    """Creates a profile matrix with pseudocounts."""
-    k = len(Motifs[0])
-    t = len(Motifs)
-    profile = {'A': [1] * k, 'C': [1] * k, 'G': [1] * k, 'T': [1] * k}
-    for motif in Motifs:
-        for i, nucleotide in enumerate(motif):
-            profile[nucleotide][i] += 1
-    for nucleotide in profile:
-        for i in range(k):
-            profile[nucleotide][i] /= (t + 4)
-    return profile
-
-def ProfileRandomlyGeneratedKmer(Text, k, Profile):
-    """Generates a k-mer from Text based on probabilities in Profile - OPTIMIZED"""
-    n = len(Text) - k + 1
-    if n <= 0:
-        return Text[:k] if len(Text) >= k else Text
-    
-    # Pre-calculate all probabilities at once (faster than calculating one by one)
-    probabilities = []
-    for i in range(n):
-        kmer = Text[i:i + k]
-        probability = 1.0
-        for j, nucleotide in enumerate(kmer):
-            probability *= Profile[nucleotide][j]
-        probabilities.append(probability)
-    
-    # Fast selection
-    total_probability = sum(probabilities)
-    if total_probability == 0:
-        # If all probabilities are 0, choose randomly
-        random_index = random.randint(0, n - 1)
-    else:
-        # Use faster selection method
-        try:
-            random_index = random.choices(range(n), weights=probabilities)[0]
-        except:
-            # Fallback if choices fails
-            probabilities = [p / total_probability for p in probabilities]
-            rand_val = random.random()
-            cumulative = 0
-            random_index = 0
-            for i, prob in enumerate(probabilities):
-                cumulative += prob
-                if rand_val <= cumulative:
-                    random_index = i
-                    break
-    
-    return Text[random_index:random_index + k]
-
-def Score(Motifs):
-    """Calculates the score of a set of motifs."""
-    k = len(Motifs[0])
-    t = len(Motifs)
-    consensus = Consensus(Motifs)
-    score = 0
-    for motif in Motifs:
-        for i in range(k):
-            if motif[i] != consensus[i]:
-                score += 1
-    return score
-
-def Consensus(Motifs):
-    """Generates the consensus string from a set of motifs."""
-    k = len(Motifs[0])
-    t = len(Motifs)
-    consensus = ''
-    for i in range(k):
-        counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0}
-        for motif in Motifs:
-            counts[motif[i]] += 1
-        max_count = 0
-        max_nucleotide = ''
-        for nucleotide, count in counts.items():
-            if count > max_count:
-                max_count = count
-                max_nucleotide = nucleotide
-        consensus += max_nucleotide
-    return consensus
-
 def read_input():
     """Read input from file or stdin"""
-    # Read from file if provided as argument, otherwise from stdin
     if len(sys.argv) > 1:
-        filename = sys.argv[1]
-        with open("data/part_4_data/sample_3.txt", 'r') as f:
+        with open(sys.argv[1], 'r') as f:
             lines = [line.strip() for line in f.readlines()]
     else:
-        lines = []
-        try:
-            while True:
-                line = input().strip()
-                if line:
-                    lines.append(line)
-        except EOFError:
-            pass
+        lines = [line.strip() for line in sys.stdin.readlines()]
     
-    if not lines:
-        print("No input provided")
-        sys.exit(1)
+    # Parse parameters
+    k, t, N = map(int, lines[0].split())
     
-    # Parse first line: k t N
-    params = lines[0].split()
-    k = int(params[0])
-    t = int(params[1])
-    N = int(params[2])
-    
-    # Parse DNA sequences - handle both formats
-    dna = []
-    
-    if len(lines) == 2:  # All sequences on one line (space-separated)
-        sequences = lines[1].split()
-        dna = sequences
-    else:  # Each sequence on separate line
-        for i in range(1, len(lines)):
-            if lines[i].strip():
-                dna.append(lines[i].strip())
-    
-    # Validate input
-    if len(dna) != t:
-        print(f"Error: Expected {t} DNA sequences, got {len(dna)}")
-        sys.exit(1)
+    # Parse DNA - handle both formats
+    if len(lines) == 2:
+        dna = lines[1].split()  # Space-separated
+    else:
+        dna = [lines[i] for i in range(1, t+1)]  # Line-separated
     
     return k, t, N, dna
 
-def main():
-    """Main function - HEAVILY OPTIMIZED FOR SPEED"""
-    # Read input
-    k, t, N, Dna = read_input()
+def create_profile(motifs, k):
+    """Create profile with pseudocounts - simplified"""
+    profile = {'A': [1]*k, 'C': [1]*k, 'G': [1]*k, 'T': [1]*k}
     
-    # DRASTIC speed optimizations for large problems
-    if k >= 12 and t >= 15:  # Large problem like yours
-        max_iterations = min(N, 20)  # Use only 20 iterations instead of 2000!
-        num_runs = 3                 # Only 3 runs instead of 20
-        print(f"SPEED MODE: Using {num_runs} runs with {max_iterations} iterations each", file=sys.stderr)
-    elif k >= 8 or t >= 10:
-        max_iterations = min(N, 50)
-        num_runs = 5
-        print(f"FAST MODE: Using {num_runs} runs with {max_iterations} iterations each", file=sys.stderr)
+    for motif in motifs:
+        for i, nuc in enumerate(motif):
+            profile[nuc][i] += 1
+    
+    total = len(motifs) + 4
+    for nuc in profile:
+        for i in range(k):
+            profile[nuc][i] /= total
+    
+    return profile
+
+def random_kmer(text, k, profile):
+    """Simple random k-mer selection"""
+    n = len(text) - k + 1
+    probs = []
+    
+    for i in range(n):
+        kmer = text[i:i+k]
+        p = 1.0
+        for j, nuc in enumerate(kmer):
+            p *= profile[nuc][j]
+        probs.append(p)
+    
+    # Simple weighted selection
+    total = sum(probs)
+    if total == 0:
+        idx = random.randint(0, n-1)
     else:
-        max_iterations = min(N, 100)
-        num_runs = 10
-        print(f"NORMAL MODE: Using {num_runs} runs with {max_iterations} iterations each", file=sys.stderr)
+        r = random.random() * total
+        cumsum = 0
+        idx = 0
+        for i, p in enumerate(probs):
+            cumsum += p
+            if r <= cumsum:
+                idx = i
+                break
     
-    print(f"Problem: k={k}, t={t}, avg_seq_len={sum(len(seq) for seq in Dna) // len(Dna)}", file=sys.stderr)
+    return text[idx:idx+k]
+
+def score(motifs):
+    """Simple scoring"""
+    if not motifs:
+        return 1000
     
-    # Run GibbsSampler with reduced parameters
-    all_best_motifs = []
-    best_score_overall = float('inf')
+    k = len(motifs[0])
+    total = 0
     
-    for run in range(num_runs):
-        print(f"Run {run + 1}/{num_runs}", file=sys.stderr)
+    for pos in range(k):
+        counts = {'A':0, 'C':0, 'G':0, 'T':0}
+        for motif in motifs:
+            counts[motif[pos]] += 1
+        max_count = max(counts.values())
+        total += len(motifs) - max_count
+    
+    return total
+
+def gibbs_minimal(dna, k, t, max_iter=10):
+    """Minimal Gibbs sampler - VERY limited iterations"""
+    # Random initial motifs
+    motifs = []
+    for seq in dna:
+        start = random.randint(0, max(0, len(seq) - k))
+        motifs.append(seq[start:start+k])
+    
+    best_motifs = motifs[:]
+    best_score = score(best_motifs)
+    
+    # Very few iterations
+    for _ in range(max_iter):
+        i = random.randint(0, t-1)
         
-        best_motifs = GibbsSampler(Dna, k, t, max_iterations)  # Use reduced iterations
-        score = Score(best_motifs)
-        all_best_motifs.append(best_motifs)
+        # Profile without motif i
+        reduced = motifs[:i] + motifs[i+1:]
+        profile = create_profile(reduced, k)
         
-        if score < best_score_overall:
-            best_score_overall = score
-            print(f"New best score: {score}", file=sys.stderr)
+        # New motif
+        motifs[i] = random_kmer(dna[i], k, profile)
+        
+        # Check improvement
+        current_score = score(motifs)
+        if current_score < best_score:
+            best_score = current_score
+            best_motifs = motifs[:]
     
-    # Select overall best motifs
-    best_motifs_overall = min(all_best_motifs, key=Score)
+    return best_motifs
+
+def main():
+    print("Reading input...", file=sys.stderr)
+    k, t, N, dna = read_input()
     
-    print(f"Final best score: {Score(best_motifs_overall)}", file=sys.stderr)
+    print(f"k={k}, t={t}, sequences loaded", file=sys.stderr)
     
-    # Print the best motifs space-separated
-    print(" ".join(best_motifs_overall))
+    # EXTREMELY limited parameters for speed
+    if k >= 12:
+        iterations = 2000   # Only 5 iterations!
+        runs = 20      # Only 2 runs!
+    else:
+        iterations = 2000
+        runs = 20
+    
+    print(f"Using {runs} runs with {iterations} iterations each", file=sys.stderr)
+    
+    best_overall = None
+    best_score_overall = 1000
+    
+    for run in range(runs):
+        print(f"Run {run+1}", file=sys.stderr)
+        
+        result = gibbs_minimal(dna, k, t, iterations)
+        current_score = score(result)
+        
+        if current_score < best_score_overall:
+            best_score_overall = current_score
+            best_overall = result
+            print(f"Score: {current_score}", file=sys.stderr)
+    
+    print(f"Done! Final score: {best_score_overall}", file=sys.stderr)
+    print(" ".join(best_overall))
 
 if __name__ == "__main__":
     main()
