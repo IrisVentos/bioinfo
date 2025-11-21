@@ -1,10 +1,12 @@
 # Bioinformatics Code Challenges
 A collection of computational biology exercises exploring fundamental problems in bioinformatics, from finding DNA replication origins to genome sequencing and assembly.
 
-📚 ## Overview
+📚 Overview
+---------------
 This repository contains implementations of various bioinformatics algorithms and solutions to computational challenges in genomics. Each section tackles a different aspect of computational biology, building from basic pattern matching to complex genome analysis.
 
-🧬 ## Contents
+🧬 Contents
+----------------
 
 ### **Part 1: DNA Replication & Motif Finding**
 Explores the biological mechanisms of genome replication and the computational methods to identify replication origins.
@@ -55,4 +57,5 @@ Additional bioinformatics topics and algorithms will be added.
 
 
 📝 Notes
+-------------------
 This is an ongoing learning project. Code is documented with biological context to bridge computational methods with their real-world applications in genomics and molecular biology.
