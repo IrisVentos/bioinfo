@@ -29,52 +29,13 @@ def create_edge_list(graph):
             edges[node].append(neighbor)
     return edges
 
-def calculate_degrees(graph):
-    """Calculate in-degree and out-degree for each node."""
-    in_degree = defaultdict(int)
-    out_degree = defaultdict(int)
-    
-    for node in graph:
-        out_degree[node] += len(graph[node])
-        for neighbor in graph[node]:
-            in_degree[neighbor] += 1
-    
-    # Ensure all nodes are in both dictionaries
-    all_nodes = set(graph.keys()) | set(in_degree.keys())
-    for node in all_nodes:
-        if node not in in_degree:
-            in_degree[node] = 0
-        if node not in out_degree:
-            out_degree[node] = 0
-    
-    return in_degree, out_degree
-
-def find_start_node(graph):
-    """Find the starting node for Eulerian path."""
-    in_degree, out_degree = calculate_degrees(graph)
-    
-    # Look for node with out-degree - in-degree = 1 (start of path)
-    start_node = None
-    for node in set(list(in_degree.keys()) + list(out_degree.keys())):
-        if out_degree[node] - in_degree[node] == 1:
-            start_node = node
-            break
-    
-    # If no such node exists, start from any node with edges (Eulerian cycle case)
-    if start_node is None:
-        for node in graph:
-            if graph[node]:
-                start_node = node
-                break
-    
-    return start_node
-
 def find_cycle(edges, start):
     """Find a cycle starting from a given node."""
     cycle = [start]
     current = start
     
     while edges[current]:
+        # Randomly pick next edge (or just take first available)
         next_node = edges[current].pop(0)
         cycle.append(next_node)
         current = next_node
@@ -95,23 +56,36 @@ def find_node_with_unexplored_edges(cycle, edges):
             return node
     return None
 
-def eulerian_path(graph):
-    """Find an Eulerian path in the graph."""
+def rotate_cycle(cycle, new_start):
+    """Rotate cycle to start at new_start node."""
+    if new_start not in cycle:
+        return cycle
+    
+    idx = cycle.index(new_start)
+    # Rotate: keep last element (which equals first) at the end
+    return cycle[idx:-1] + cycle[:idx+1]
+
+def eulerian_cycle(graph):
+    """Find an Eulerian cycle in the graph."""
     edges = create_edge_list(graph)
     
-    # Find the starting node
-    start_node = find_start_node(graph)
+    # Start from any node with edges
+    start_node = None
+    for node in edges:
+        if edges[node]:
+            start_node = node
+            break
     
     if start_node is None:
         return []
     
-    # Form initial cycle/path
-    path = find_cycle(edges, start_node)
+    # Form initial cycle
+    cycle = find_cycle(edges, start_node)
     
     # While there are unexplored edges
     while has_unexplored_edges(edges):
-        # Find a node in the current path with unexplored edges
-        new_start = find_node_with_unexplored_edges(path, edges)
+        # Find a node in the current cycle with unexplored edges
+        new_start = find_node_with_unexplored_edges(cycle, edges)
         
         if new_start is None:
             break
@@ -119,32 +93,33 @@ def eulerian_path(graph):
         # Form a new cycle starting from new_start
         new_cycle = find_cycle(edges, new_start)
         
-        # Merge: insert the new cycle at the position of new_start
-        idx = path.index(new_start)
-        path = path[:idx] + new_cycle + path[idx+1:]
+        # Merge cycles: rotate original cycle to start at new_start,
+        # then insert the new cycle
+        idx = cycle.index(new_start)
+        cycle = cycle[:idx] + new_cycle + cycle[idx+1:]
     
-    return path
+    return cycle
 
-def write_output(filename, path):
-    """Write the Eulerian path to output file."""
+def write_output(filename, cycle):
+    """Write the Eulerian cycle to output file."""
     with open(filename, 'w') as f:
-        f.write(' '.join(map(str, path)) + '\n')
+        f.write(' '.join(map(str, cycle)) + '\n')
 
 def main():
     # Input and output file names
-    input_file = "datasets/dataset_7.txt"
-    output_file = "datasets/output_7.txt"
+    input_file = "datasets/dataset_6.txt"
+    output_file = "datasets/output_6.txt"
     
     # Read graph from input file
     graph = read_graph(input_file)
     
-    # Find Eulerian path
-    path = eulerian_path(graph)
+    # Find Eulerian cycle
+    cycle = eulerian_cycle(graph)
     
     # Write output
-    write_output(output_file, path)
+    write_output(output_file, cycle)
     
-    print(f"Eulerian path found: {' '.join(map(str, path))}")
+    print(f"Eulerian cycle found: {' '.join(map(str, cycle))}")
     print(f"Output written to {output_file}")
 
 if __name__ == "__main__":
