@@ -67,14 +67,14 @@ def k_universal_circular_string(k):
 
 def main():
     # Read input from file
-    with open('input.txt', 'r') as f:
+    with open('bioinfo_genome_sequencing/datasets/dataset_9.txt', 'r') as f:
         k = int(f.read().strip())
     
     # Generate k-universal circular string
     result = k_universal_circular_string(k)
     
     # Write output to file
-    with open('output.txt', 'w') as f:
+    with open('bioinfo_genome_sequencing/datasets/output_9.txt', 'w') as f:
         f.write(result)
     
     print(f"k-universal circular string for k={k}: {result}")
