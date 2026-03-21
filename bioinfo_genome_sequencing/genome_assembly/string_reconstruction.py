@@ -25,7 +25,7 @@ def string_reconstruction(k, patterns):
 
 def main():
     # Read input from file
-    with open('bioinfo_genome_sequencing/datasets/dataset_8.txt', 'r') as f:
+    with open('bioinfo_genome_sequencing/datasets/test.txt', 'r') as f:
         lines = f.readlines()
     
     # Parse k value
@@ -38,7 +38,7 @@ def main():
     result = string_reconstruction(k, patterns)
     
     # Write output to file
-    with open('bioinfo_genome_sequencing/datasets/output_8.txt', 'w') as f:
+    with open('bioinfo_genome_sequencing/datasets/output_test.txt', 'w') as f:
         f.write(result)
     
     print(f"Reconstructed genome: {result}")
