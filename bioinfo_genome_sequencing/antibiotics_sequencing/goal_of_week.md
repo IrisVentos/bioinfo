@@ -37,7 +37,7 @@ Working with the Mass Spectrometer, building a theoretical spectrum = the list o
 Towards a computational problem : going from spectrum to peptide.
 
 Note : Some antibiotics are RiPPs (ribosomally synthesized and post translationally modified peptides) are a large and growing class of antibiotics that are encoded by DNA, transcribed into mRNA, and translated by ribosomes like any normal protein. The resulting peptide is then heavily modified by dedicated enzymes. Examples include:
-- Nisin (a lantibiotic used in food preservation)
+- Nisin (an antibiotic used in food preservation)
 - Microcin antibiotics in bacteria
 - Thiopeptides like GE2270A
 
@@ -48,6 +48,26 @@ Reconstruct a cyclic peptide from its theoretical spectrum
 ### Brute force algorithm
 
 The mass of the entire peptide is usually known.
-1. Generate all peptides with given mass
+1. Generate all peptides with given mass (in this case, trillions)
 2. Form their theoretical spectra
 3. Look for matches with the given spectrum, try all candidates
+
+Spectrum = sum along the chain of peptides (growing and growing). If same, potential candidates can remain.
+
+### Cyclopeptide sequencing with Branch-and-Bound
+
+It is a method for solving optimization problems by breaking them down into smaller subproblems and using a bounding function to eliminate subproblems that cannot contain the optimal solution.
+The algorithm explores branches of this tree, which represent subsets of the solution set. 
+Before enumerating the candidate solutions of a branch, the branch is checked against upper and lower estimated bounds on the optimal solution, and is discarded if it cannot produce a better solution than the best one found so far by the algorithm.
+
+Bounds = potential solutions
+then branches again
+until final bounds are consistent with Spectrum.
+The goal is to trim the initial list
+
+B&B for cyclopeptide sequencing :
+1. Find all amino acids whose masses occur in Spectrum. Add to List.
+2. Extend each peptide in List by each of 18 different AA masses.
+3. Trim inconsistent peptides from List.
+4. Return any peptides in List whose theoretical spectra match Spectrum.
+5. Iterate Steps 2-4 until List is empty (final bounds)
