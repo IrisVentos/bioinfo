@@ -61,7 +61,7 @@ The algorithm explores branches of this tree, which represent subsets of the sol
 Before enumerating the candidate solutions of a branch, the branch is checked against upper and lower estimated bounds on the optimal solution, and is discarded if it cannot produce a better solution than the best one found so far by the algorithm.
 
 Bounds = potential solutions
-then branches again
+then branches again to remove hopeless candidates
 until final bounds are consistent with Spectrum.
 The goal is to trim the initial list
 
@@ -71,3 +71,7 @@ B&B for cyclopeptide sequencing :
 3. Trim inconsistent peptides from List.
 4. Return any peptides in List whose theoretical spectra match Spectrum.
 5. Iterate Steps 2-4 until List is empty (final bounds)
+
+Note!
+
+The number of DNA strings that encode a given amino acid sequence is the product of the number of codons for each amino acid.
