@@ -44,11 +44,14 @@ Note : Some antibiotics are RiPPs (ribosomally synthesized and post translationa
 ## Cyclopeptide Sequencing Problem 
 
 Reconstruct a cyclic peptide from its theoretical spectrum
+Experimental spectrum → comes from the lab (mass spectrometer breaks the real peptide and measures the fragments)
+Theoretical spectrum → comes from math (you take a candidate sequence and compute what its fragments should weigh)
+The goal → find the candidate whose theoretical spectrum best matches the experimental one
 
 ### Brute force algorithm
 
 The mass of the entire peptide is usually known.
-1. Generate all peptides with given mass (in this case, trillions)
+1. Generate all peptides with g iven mass (in this case, trillions)
 2. Form their theoretical spectra
 3. Look for matches with the given spectrum, try all candidates
 
@@ -75,3 +78,50 @@ B&B for cyclopeptide sequencing :
 Note!
 
 The number of DNA strings that encode a given amino acid sequence is the product of the number of codons for each amino acid.
+
+## From theory to experience 
+
+The experimental spectra (as opposed to theoretical) is flawed. The spectrum is noisy in practice.
+It produces false masses or hides some.
+A false mass is present in the experimental spectrum but absent from the theoretical spectrum; a missing mass is present in the theoretical spectrum but absent from the experimental spectrum.
+We need a new approach as the current algo matches exactly a peptide's theoretical spectrum with the experimental spectrum.
+
+--> scoring a peptide on how many masses its spectrum shares with the experimental spectrum and find best candidates, including ties.
+
+### Leaderboard Cyclopeptide Sequencing
+
+The gist is :
+
+1. Add "O peptide" to Leaderboard as LeaderPeptide
+2. Extend each peptide in Leaderboard by each 18 different amino-acid masses
+3. Cut low-scoring peptides (keep top N with ties)
+4. Update LeaderPeptide with candidates with mass(Leaderboard) = parent mass
+5. Eliminate others
+6. Iterate
+7. Return LeaderPeptide
+
+It may generate errors as it is heuristic (trial & error, aka eliminates good candidates in the beginning)
+
+### NRPs exception
+
+As they fall outside of the central dogma, NRPs contain more non-standard amino acids.
+From 18 to 100+ amino masses.
+It complicates things even more for noisy spectra.
+
+### The spectral convolution saves the day
+
+Goal : reduce the nb of aa that we need to consider
+Spectral convolution : positive difference between every pair of masses in spectrum.
+ 
+The convolution of two spectra S₁ and S₂ is defined as the multiset of all pairwise differences between peaks:
+
+Conv(S₁, S₂) = { s₁ − s₂ | s₁ ∈ S₁, s₂ ∈ S₂ }
+
+When you convolve a theoretical spectrum against an experimental spectrum, peaks (of intensity aka # of ions of peptide fragments) that appear frequently in the result correspond to mass shifts that are consistent across many fragment pairs — which reveals likely amino acid masses in the sequence.
+
+The Sequencing Pipeline : 
+
+1. Acquire MS/MS spectrum of the antibiotic peptide
+2. Generate candidate amino acid alphabet using spectral convolution (the most frequent differences ≈ likely residue masses)
+3. Score candidate sequences by comparing their theoretical spectra against the experimental one
+4. Search cyclically for cyclic peptides using a leaderboard algorithm
