@@ -117,7 +117,7 @@ The convolution of two spectra S₁ and S₂ is defined as the multiset of all p
 
 Conv(S₁, S₂) = { s₁ − s₂ | s₁ ∈ S₁, s₂ ∈ S₂ }
 
-When you convolve a theoretical spectrum against an experimental spectrum, peaks (of intensity aka # of ions of peptide fragments) that appear frequently in the result correspond to mass shifts that are consistent across many fragment pairs — which reveals likely amino acid masses in the sequence.
+When you convolve a theoretical spectrum against an experimental spectrum, peaks (of intensity aka # of ions of peptide fragments) that appear frequently in the result correspond to mass shifts that are consistent across many fragment pairs — which reveals likely "missing" amino acid masses in the sequence.
 
 The Sequencing Pipeline : 
 
