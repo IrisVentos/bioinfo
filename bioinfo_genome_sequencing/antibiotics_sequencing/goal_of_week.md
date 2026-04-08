@@ -4,6 +4,7 @@ A substance that kills bacteria. It occurs naturally because of millions of year
 
 On the molecular level
 We will study Tyrocidine B1, an antibiotic produced by bacteria Bacillus Brevis. B1 is a mini-protein called a peptide, short string of amino acids.
+ 
 
 ## How are antibiotics produced?
 

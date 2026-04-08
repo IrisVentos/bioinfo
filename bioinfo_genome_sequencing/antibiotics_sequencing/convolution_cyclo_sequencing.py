@@ -60,5 +60,6 @@ if __name__ == "__main__":
     m        = int(lines[0].strip())
     n        = int(lines[1].strip())
     spectrum = list(map(int, lines[2].split()))
-    leaders = convolution_cyclopeptide_sequencing(spectrum, m, n)
-    print("-".join(map(str, leaders[0])))
+    leaders  = convolution_cyclopeptide_sequencing(spectrum, m, n)
+    for pep in leaders:
+        print("-".join(map(str, pep)))
